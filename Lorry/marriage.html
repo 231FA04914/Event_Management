@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marriage Hall Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ff6600;
+            padding: 15px;
+            color: white;
+        }
+        .search-bar {
+            padding: 10px;
+            width: 250px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+        }
+        .marriage-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .marriage {
+            background: white;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+            width: 260px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .marriage img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .marriage:hover {
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        .modal.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <input type="text" class="search-bar" placeholder="Search weddings..." onkeyup="searchMarriages()">
+        <button onclick="window.location.href='index.html'">Back to Home</button>
+        <button onclick="window.location.href='bookings.html'">Your Bookings</button>
+    </div>
+
+    <div class="marriage-list" id="marriageList"></div>
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Book Festival</h3>
+            <label>No. of Visitors:</label>
+            <input type="number" id="visitors" min="1"><br>
+            <label>Date:</label>
+            <input type="date" id="bookingDate"><br>
+            <label>Time From:</label>
+            <select id="timeFromHour">
+                <option value ="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="timeFromMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeFromPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Time To:</label>
+            <select id="timeToHour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="timeToMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeToPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Type of Food:</label>
+            <select id="foodType">
+                <option>Veg</option>
+                <option>Non-Veg</option>
+                <option>Mixed</option>
+            </select><br>
+            <label>Suggest a Food Item:</label>
+            <input type="text" id="foodSuggestion"><br>
+            <button onclick="confirmBooking()">Confirm Booking</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+       const marriages = [
+    { name: "Royal Grand Hall", city: "Delhi", rent: 70000, img: "marriage1.jpg" },
+    { name: "Golden Palace", city: "Mumbai", rent: 85000, img: "marriage2.jpg" },
+    { name: "Pearl Banquet", city: "Bangalore", rent: 60000, img: "marriage3.jpg" },
+    { name: "Emerald Hall", city: "Chennai", rent: 72000, img: "marriage4.jpg" },
+    { name: "Diamond Wedding Venue", city: "Hyderabad", rent: 95000, img: "marriage5.jpg" },
+    { name: "Lavish Wedding Hall", city: "Kolkata", rent: 80000, img: "marriage6.jpg" },
+    { name: "Majestic Banquet", city: "Pune", rent: 75000, img: "marriage7.jpg" },
+    { name: "Crystal Palace", city: "Ahmedabad", rent: 68000, img: "marriage8.jpg" },
+    { name: "Starlight Venue", city: "Jaipur", rent: 62000, img: "marriage9.jpg" },
+    { name: "Serene Wedding Hall", city: "Lucknow", rent: 57000, img: "marriage10.jpg" },
+    { name: "Opulent Oasis", city: "Surat", rent: 90000, img: "marriage11.jpg" },
+    { name: "Charming Celebrations", city: "Coimbatore", rent: 64000, img: "marriage12.jpg" },
+    { name: "Noble Nook", city: "Indore", rent: 71000, img: "marriage13.jpg" },
+    { name: "Glamour Hall", city: "Nagpur", rent: 68000, img: "marriage14.jpg" },
+    { name: "Regal Retreat", city: "Visakhapatnam", rent: 72000, img: "marriage15.jpg" },
+    { name: "Lavender Lounge", city: "Mysore", rent: 59000, img: "marriage16.jpg" },
+    { name: "Harmony Hall", city: "Nashik", rent: 65000, img: "marriage17.jpg" },
+    { name: "Elysium Events", city: "Ranchi", rent: 50000, img: "marriage18.jpg" },
+    { name: "Blissful Banquet", city: "Dehradun", rent: 54000, img: "marriage19.jpg" },
+    { name: "Radiant Room", city: "Agra", rent: 58000, img: "marriage20.jpg" },
+    { name: "Chic Chamber", city: "Gurgaon", rent: 80000, img: "marriage21.jpg" },
+    { name: "Vibrant Venue", city: "Noida", rent: 75000, img: "marriage22.jpg" },
+    { name: "Sapphire Suite", city: "Faridabad", rent: 72000, img: "marriage23.jpg" },
+    { name: "Crown Hall", city: "Thane", rent: 90000, img: "marriage24.jpg" },
+    { name: "The Grand Ballroom", city: "Chandigarh", rent: 85000, img: "marriage25.jpg" },
+    { name: "Sunset Terrace", city: "Thiruvananthapuram", rent: 60000, img: "marriage26.jpg" },
+    { name: "Moonlit Garden", city: "Ludhiana", rent: 67000, img: "marriage27.jpg" },
+    { name: "The Elegant Hall", city: "Patna", rent: 62000, img: "marriage28.jpg" },
+    { name: "The Royal Pavilion", city: "Bhopal", rent: 75000, img: "marriage29.jpg" },
+    { name: "The Enchanted Hall", city: "Mysore", rent: 70000, img: "marriage30.jpg" }
+];
+
+        function displayMarriages(filteredMarriages = marriages) {
+            const marriageList = document.getElementById("marriageList");
+            marriageList.innerHTML = "";
+            filteredMarriages.forEach((marriage) => {
+                const marriageDiv = document.createElement("div");
+                marriageDiv.classList.add("marriage");
+                marriageDiv.innerHTML = <img src="${marriage.img}" alt="${marriage.name}"><h3>${marriage.name}</h3><p>${marriage.city}</p><p>Rent: ₹${marriage.rent}</p>;
+                marriageDiv.onclick = () => openMarriageBookingModal(marriage.name);
+                marriageList.appendChild(marriageDiv);
+            });
+        }
+        
+        function searchMarriages() {
+            const query = document.querySelector(".search-bar").value.toLowerCase();
+            const filteredMarriages = marriages.filter(marriage => marriage.city.toLowerCase().includes(query) || marriage.name.toLowerCase().includes(query));
+            displayMarriages(filteredMarriages);
+        }
+        
+        function openMarriageBookingModal(marriageName) {
+            document.getElementById("modalTitle").innerText = Book ${marriageName};
+            document.getElementById("marriageBookingModal").classList.add("active");
+        }
+
+        function closeMarriageModal() {
+            document.getElementById("marriageBookingModal").classList.remove("active");
+        }
+
+        function confirmMarriageBooking() {
+            const guests = document.getElementById("marriageGuests").value;
+            const foodType = document.getElementById("marriageFoodType").value;
+            const specialRequest = document.getElementById("marriageSpecialRequest").value;
+            
+            if (guests && foodType) {
+                const bookingDetails = {
+                    marriage: document.getElementById("modalTitle").innerText.replace("Book ", ""),
+                    guests,
+                    foodType,
+                    specialRequest
+                };
+                
+                let bookings = JSON.parse(localStorage.getItem("marriageBookings")) || [];
+                bookings.push(bookingDetails);
+                localStorage.setItem("marriageBookings", JSON.stringify(bookings));
+                alert("Booking Confirmed!");
+                closeMarriageModal();
+            } else {
+                alert("Please fill all details");
+            }
+        }
+
+        displayMarriages();
+    </script>
+</body>
+</html>

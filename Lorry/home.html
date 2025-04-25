@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background-image: url("homebackground.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #000000;
+            color: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 40px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        .dropdown {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .right a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s, transform 0.2s;
+        }
+
+        .right a:hover {
+            color: #f5f5f5;
+            transform: scale(1.05);
+        }
+
+        .cart {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 10px;
+            color: gray;
+        }
+
+        .search-container input {
+            padding: 8px 10px 8px 30px;
+            border-radius: 5px;
+            border: none;
+            font-size: 14px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 4rem;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .event-btn {
+            background: linear-gradient(45deg, #ff6600, #ff6600);
+            color: white;
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+        }
+
+        .event-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(255, 69, 0, 0.5);
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            transition: transform 0.3s ease-in-out;
+            width: 300px;
+        }
+
+        .modal.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-body {
+            padding: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ff6600;
+            border: none;
+            background: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                top: 35%;
+            }
+
+            .buttons-container {
+                top: 55%;
+                gap: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .right {
+                margin-top: 10px;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .search-container input {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="left">
+            <a href="home.html">
+                <img src="event.jpg.png" alt="EventManagement" class="logo">
+            </a>
+            <form action="#">
+                <label for="location">Location:</label>
+                <select id="location" class="dropdown">
+                    <option>Select Location</option>
+                    <option>Bangalore</option>
+                    <option>Hyderabad</option>
+                    <option>Andhra Pradesh</option>
+                    <option>Mumbai</option>
+                    <option>Delhi</option>
+                </select>
+            </form>
+        </div>
+
+        <nav class="right">
+            <a href="services.html"><i class="fa-solid fa-life-ring"></i> Services</a>
+            <a href="contact.html"><i class="fa-solid fa-phone"></i> Contact Us</a>
+            <a href="Aboutus.html" class="cart"><i class="fa-regular fa-address-card"></i> About Us</a>
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+        </nav>
+    </header>
+
+    <h1>Event Management</h1>
+    <div class="buttons-container">
+        <button class="event-btn" onclick="navigate('festival.html')">🎉 Festival</button>
+        <button class="event-btn" onclick="navigate('birthday.html')">🎂 Birthday</button>
+        <button class="event-btn" onclick="navigate('marriage.html')">💍 Marriage</button>
+        <button class="event-btn" onclick="navigate('meeting.html')">📅 Meeting</button>
+        <button class="event-btn" onclick="navigate('concert.html')">🎶 Concert</button>
+        <button class="event-btn" onclick="navigate('college.html')">🏫 College</button>
+    </div>
+
+    <div class="modal" id="infoModal">
+        <div class="modal-header">
+            <span id="modal-title">Event Information</span>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">Navigating...</div>
+    </div>
+
+    <script>
+        function navigate(page) {
+            document.getElementById('modal-body').innerHTML = `Navigating to <b>${page}</b>...`;
+            document.getElementById('infoModal').classList.add('active');
+            setTimeout(() => {
+                window.location.href = page;
+            }, 1200);
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

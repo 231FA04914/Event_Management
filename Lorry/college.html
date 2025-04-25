@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Fest Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ff6600;
+            padding: 15px;
+            color: white;
+        }
+        
+        .search-bar {
+            padding: 10px;
+            width: 280px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+        
+        .college-fest-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        
+        .college-fest {
+            background: white;
+            padding: 15px;
+            margin: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out;
+            width: 280px;
+            text-align: center;
+        }
+        
+        .college-fest img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .college-fest:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+
+        .modal-content input, 
+        .modal-content select {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .modal-content button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background-color: #ff6600;
+            color: white;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #ff6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <input type="text" class="search-bar" placeholder="Search college fest..." onkeyup="searchCollegeFests()">
+        <button onclick="window.location.href='home.html'">Back to Home</button>
+        <button onclick="window.location.href='bookings.html'">Your Bookings</button>
+    </div>
+
+    <div class="college-fest-list" id="collegeFestList"></div>
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Book Festival</h3>
+            <label>No. of Visitors:</label>
+            <input type="number" id="visitors" min="1"><br>
+            <label>Date:</label>
+            <input type="date" id="bookingDate"><br>
+            <label>Time From:</label>
+            <select id="timeFromHour"></select>
+            <select id="timeFromMinute"></select>
+            <select id="timeFromPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Time To:</label>
+            <select id="timeToHour"></select>
+            <select id="timeToMinute"></select>
+            <select id="timeToPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Type of Food:</label>
+            <select id="foodType">
+                <option>Veg</option>
+                <option>Non-Veg</option>
+                <option>Mixed</option>
+            </select><br>
+            <label>Suggest a Food Item:</label>
+            <input type="text" id="foodSuggestion"><br>
+            <button onclick="confirmBooking()">Confirm Booking</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const collegeFests = [
+            { name: "Tech Fest", city: "Bangalore", rent: 25000, img: "collegefest1.jpg" },
+            { name: "Cultural Fest", city: "Chennai", rent: 30000, img: "collegefest2.jpg" },
+            { name: "Innovation Expo", city: "Delhi", rent: 35000, img: "collegefest3.jpg" },
+            { name: "Music Carnival", city: "Mumbai", rent: 40000, img: "collegefest4.jpg" },
+            { name: "Dance Extravaganza", city: "Hyderabad", rent: 28000, img: "collegefest5.jpg" },
+            { name: "Art Fest", city: "Kolkata", rent: 22000, img: "collegefest6.jpg" },
+            { name: "Literature Festival", city: "Pune", rent: 27000, img: "collegefest7.jpg" },
+            { name: "Sports Meet", city: "Ahmedabad", rent: 32000, img: "collegefest8.jpg" },
+            { name: "Science Fair", city: "Jaipur", rent: 29000, img: "collegefest9.jpg" },
+            { name: "Entrepreneurship Summit", city: "Surat", rent: 33000, img: "collegefest10.jpg" }
+        ];
+
+        function displayCollegeFests(filteredFests = collegeFests) {
+            const collegeFestList = document.getElementById("collegeFestList");
+            collegeFestList.innerHTML = "";
+            filteredFests.forEach((fest) => {
+                const festDiv = document.createElement("div");
+                festDiv.classList.add("college-fest");
+                festDiv.innerHTML = `<img src="${fest.img}" alt="${fest.name}"><h3>${fest.name}</h3><p>${fest.city}</p><p>Rent: ₹${fest.rent}</p>`;
+                festDiv.onclick = () => openCollegeBookingModal(fest.name);
+                collegeFestList.appendChild(festDiv);
+            });
+        }
+
+        function searchCollegeFests() {
+            const query = document.querySelector(".search-bar").value.toLowerCase();
+            const filteredFests = collegeFests.filter(fest =>
+                fest.city.toLowerCase().includes(query) || fest.name.toLowerCase().includes(query)
+            );
+            displayCollegeFests(filteredFests);
+        }
+
+        let selectedFest = '';
+
+        function openCollegeBookingModal(festName) {
+            selectedFest = festName;
+            document.getElementById("modalTitle").innerText = `Book for ${festName}`;
+            document.getElementById("bookingModal").classList.add("active");
+        }
+
+        function closeModal() {
+            document.getElementById("bookingModal").classList.remove("active");
+        }
+
+        function confirmBooking() {
+            const visitors = document.getElementById("visitors").value;
+            const date = document.getElementById("bookingDate").value;
+            const timeFrom = `${document.getElementById("timeFromHour").value}:${document.getElementById("timeFromMinute").value} ${document.getElementById("timeFromPeriod").value}`;
+            const timeTo = `${document.getElementById("timeToHour").value}:${document.getElementById("timeToMinute").value} ${document.getElementById("timeToPeriod").value}`;
+            const foodType = document.getElementById("foodType").value;
+            const suggestion = document.getElementById("foodSuggestion").value;
+
+            if (visitors && date) {
+                alert(`Booking Confirmed for ${selectedFest}!\nDate: ${date}\nVisitors: ${visitors}\nTime: ${timeFrom} to ${timeTo}\nFood: ${foodType} (${suggestion || "No suggestion"})`);
+                closeModal();
+            } else {
+                alert("Please fill all required fields!");
+            }
+        }
+
+        function populateTimeDropdowns() {
+            const hours = [...Array(12).keys()].map(i => i + 1);
+            const minutes = ["00", "15", "30", "45"];
+            hours.forEach(hour => {
+                document.getElementById("timeFromHour").innerHTML += `<option value="${hour}">${hour}</option>`;
+                document.getElementById("timeToHour").innerHTML += `<option value="${hour}">${hour}</option>`;
+            });
+            minutes.forEach(min => {
+                document.getElementById("timeFromMinute").innerHTML += `<option value="${min}">${min}</option>`;
+                document.getElementById("timeToMinute").innerHTML += `<option value="${min}">${min}</option>`;
+            });
+        }
+
+        window.onload = function () {
+            displayCollegeFests();
+            populateTimeDropdowns();
+        };
+    </script>
+</body>
+</html>

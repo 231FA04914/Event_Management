@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room Booking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .header-left h2 {
+            margin: 0;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .header-buttons button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .back-home-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .your-bookings-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .search-bar {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-bar input[type="text"] {
+            padding: 10px;
+            width: 300px;
+        }
+        .search-bar button {
+            padding: 10px;
+        }
+        .meeting-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .meeting {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 15px;
+            padding: 15px;
+            width: 200px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .meeting img {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+        }
+        .modal-content input, .modal-content textarea, .modal-content button {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+        }
+        .close-btn {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+            border: none;
+        }
+        .no-meetings {
+            text-align: center;
+            color: gray;
+            width: 100%;
+            font-size: 18px;
+        }
+        
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <h2>Search Company</h2>
+    </div>
+    <div class="header-buttons">
+        <button class="back-home-btn" onclick="goHome()">Back to Home</button>
+        <button class="your-bookings-btn" onclick="showBookings()">Your Bookings</button>
+    </div>
+</header>
+
+<div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search by city or meeting room name">
+    <button onclick="searchMeetings()">Search</button>
+    <button onclick="resetSearch()">Reset</button>
+</div>
+
+<div class="meeting-list" id="meetingList"></div>
+
+<div class="modal" id="bookingModal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">X</button>
+        <h2 id="modalTitle">Book Meeting Room</h2>
+        <input type="number" id="attendees" placeholder="Number of Attendees" required>
+        <input type="date" id="meetingDate" required>
+        <input type="text" id="duration" placeholder="Duration (e.g., 2 hours)" required>
+        <textarea id="specialRequest" placeholder="Special Request (optional)"></textarea>
+        <button onclick="confirmBooking()">Confirm Booking</button>
+    </div>
+</div>
+
+<script>
+const meetings = [
+            { name: "Boardroom B", city: "San Francisco", rent: 7000, img: "meeting2.jpg" },
+            { name: "Executive Suite", city: "Los Angeles", rent: 6000, img: "meeting3.jpg" },
+            { name: "Meeting Room C", city: "Chicago", rent: 5500, img: "meeting4.jpg" },
+            { name: "Strategy Room", city: "Houston", rent: 6500, img: "meeting5.jpg" },
+            { name: "Innovation Hub", city: "Miami", rent: 8000, img: "meeting6.jpg" },
+            { name: "Collaboration Space", city: "Seattle", rent: 7200, img: "meeting7.jpg" },
+            { name: "Training Room", city: "Boston", rent: 4800, img: "meeting8.jpg" },
+            { name: "Workshop Room", city: "Atlanta", rent: 5300, img: "meeting9.jpg" },
+            { name: "Presentation Room", city: "Philadelphia", rent: 6000, img: "meeting10.jpg" },
+            { name: "Executive Boardroom", city: "Dallas", rent: 7500, img: "meeting11.jpg" },
+            { name: "Team Meeting Room", city: "Phoenix", rent: 4900, img: "meeting12.jpg" },
+            { name: "Creative Space", city: "San Diego", rent: 5500, img: "meeting13.jpg" },
+            { name: "Focus Room", city: "Denver", rent: 6200, img: "meeting14.jpg" },
+            { name: "Conference Hall", city: "Orlando", rent: 9000, img: "meeting15.jpg" },
+            { name: "Networking Lounge", city: "Las Vegas", rent: 7000, img: "meeting16.jpg" },
+            { name: "Small Meeting Room", city: "Charlotte", rent: 4000, img: "meeting17.jpg" },
+            { name: "Large Conference Room", city: "Detroit", rent: 8500, img: "meeting18.jpg" },
+            { name: "Video Conference Room", city: "Baltimore", rent: 6000, img: "meeting19.jpg" },
+            { name: "Executive Meeting Suite", city: "Portland", rent: 7200, img: "meeting20.jpg" },
+            { name: "Board Meeting Room", city: "Nashville", rent: 5000, img: "meeting21.jpg" },
+            { name: "Client Meeting Room", city: "Indianapolis", rent: 5500, img: "meeting22.jpg" },
+            { name: "Training and Development Room", city: "Columbus", rent: 4800, img: "meeting23.jpg" },
+            { name: "Event Space", city: "Milwaukee", rent: 8000, img: "meeting24.jpg" },
+            { name: "Conference Room D", city: "Kansas City", rent: 6000, img: "meeting25.jpg" },
+            { name: "Team Collaboration Room", city: "Virginia Beach", rent: 5300, img: "meeting26.jpg" }
+];
+
+function displayMeetings(filteredMeetings = meetings) {
+    const meetingList = document.getElementById("meetingList");
+    meetingList.innerHTML = "";
+    if (filteredMeetings.length === 0) {
+        meetingList.innerHTML = "<p class='no-meetings'>No meetings found.</p>";
+        return;
+    }
+    filteredMeetings.forEach((meeting) => {
+        const meetingDiv = document.createElement("div");
+        meetingDiv.classList.add("meeting");
+        meetingDiv.innerHTML = `
+            <img src="${meeting.img}" alt="${meeting.name}">
+            <h3>${meeting.name}</h3>
+            <p>${meeting.city}</p>
+            <p>Rent: ₹${meeting.rent}</p>`;
+        meetingDiv.onclick = () => openBookingModal(meeting.name);
+        meetingList.appendChild(meetingDiv);
+    });
+}
+
+displayMeetings();
+
+function searchMeetings() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = meetings.filter(m => 
+        m.name.toLowerCase().includes(query) || 
+        m.city.toLowerCase().includes(query)
+    );
+    displayMeetings(filtered);
+}
+
+function resetSearch() {
+    document.getElementById("searchInput").value = "";
+    displayMeetings();
+}
+
+function openBookingModal(meetingName) {
+    document.getElementById("modalTitle").innerText = `Book ${meetingName}`;
+    document.getElementById("bookingModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("bookingModal").style.display = "none";
+}
+
+function confirmBooking() {
+    const attendees = document.getElementById("attendees").value;
+    const meetingDate = document.getElementById("meetingDate").value;
+    const duration = document.getElementById("duration").value;
+    const specialRequest = document.getElementById("specialRequest").value;
+
+    if (attendees && meetingDate && duration) {
+        alert(`Booking Confirmed!\nMeeting: ${document.getElementById("modalTitle").innerText.replace("Book ", "")}\nAttendees: ${attendees}\nDate: ${meetingDate}\nDuration: ${duration}\nSpecial Request: ${specialRequest}`);
+        closeModal();
+        document.getElementById("attendees").value = "";
+        document.getElementById("meetingDate").value = "";
+        document.getElementById("duration").value = "";
+        document.getElementById("specialRequest").value = "";
+    } else {
+        alert("Please fill all required fields.");
+    }
+}
+
+function goHome() {
+    window.location.href = "index.html"; // Change the URL as per your home page
+}
+
+function showBookings() {
+    alert("Redirecting to your bookings page...");
+    // You can replace this with actual navigation logic
+}
+</script>
+
+</body>
+</html>
