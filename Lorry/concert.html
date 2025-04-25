@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concert Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #007bff;
+            padding: 15px;
+            color: white;
+        }
+
+        .search-bar {
+            padding: 8px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .concert-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .concert {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: 0.3s;
+            width: 250px;
+            text-align: center;
+            position: relative;
+        }
+
+        .concert img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .concert:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 15px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .modal-content button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <input type="text" class="search-bar" placeholder="Search concerts..." onkeyup="searchConcerts()">
+        <button onclick="window.location.href='home.html'">Back to Home</button>
+        <button onclick="window.location.href='bookings.html'">Your Bookings</button>
+    </div>
+
+    <div class="concert-list" id="concertList"></div>
+    
+    <div class="modal" id="concertBookingModal">
+        <div class="modal-content">
+            <h3 id="concertModalTitle">Book Concert</h3>
+            <label>No. of Attendees:</label>
+            <input type="number" id="concertAttendees" min="1" Max="100000"><br>
+            <label>Date:</label>
+            <input type="date" id="concertBookingDate"><br>
+            <label>Time From:</label>
+ <select id="concertTimeFromHour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="concertTimeFromMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="concertTimeFromPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Time To:</label>
+            <select id="concertTimeToHour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="concertTimeToMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="concertTimeToPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Seating Preference:</label>
+            <select id="concertSeating">
+                <option>General</option>
+                <option>VIP</option>
+            </select><br>
+            <label>Special Requests:</label>
+            <input type="text" id="concertSpecialRequest"><br>
+            <button onclick="confirmConcertBooking()">Confirm Booking</button>
+            <button onclick="closeConcertModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const concerts = [
+    { name: "Rock Night", city: "Seattle", rent: 45000, img: "concert1.jpg" },
+    { name: "Jazz Evening", city: "New Orleans", rent: 35000, img: "concert2.jpg" },
+    { name: "EDM Blast", city: "Las Vegas", rent: 60000, img: "concert3.jpg" },
+    { name: "Pop Sensation", city: "Los Angeles", rent: 50000, img: "concert4.jpg" },
+    { name: "Blues & Soul Night", city: "Chicago", rent: 40000, img: "concert5.jpg" },
+    { name: "Country Roads Festival", city: "Nashville", rent: 55000, img: "concert6.jpg" },
+    { name: "Classical Symphony", city: "Vienna", rent: 70000, img: "concert7.jpg" },
+    { name: "Hip-Hop Live", city: "New York", rent: 48000, img: "concert8.jpg" },
+    { name: "Reggae Vibes", city: "Kingston", rent: 42000, img: "concert9.jpg" },
+    { name: "Metal Mania", city: "Berlin", rent: 65000, img: "concert10.jpg" },
+    { name: "Folk Fusion", city: "San Francisco", rent: 39000, img: "concert11.jpg" },
+    { name: "Bollywood Beats", city: "Mumbai", rent: 55000, img: "concert12.jpg" },
+    { name: "K-Pop Extravaganza", city: "Seoul", rent: 70000, img: "concert13.jpg" },
+    { name: "Latin Groove", city: "Rio de Janeiro", rent: 50000, img: "concert14.jpg" },
+    { name: "Trance Festival", city: "Ibiza", rent: 75000, img: "concert15.jpg" },
+    { name: "Indie Rock Fest", city: "Austin", rent: 43000, img: "concert16.jpg" },
+    { name: "Big Band Swing", city: "London", rent: 47000, img: "concert17.jpg" },
+    { name: "Punk Revolution", city: "Tokyo", rent: 49000, img: "concert18.jpg" },
+    { name: "Acoustic Nights", city: "Sydney", rent: 36000, img: "concert19.jpg" },
+    { name: "Gospel Celebration", city: "Atlanta", rent: 41000, img: "concert20.jpg" },
+    { name: "Sufi Music Night", city: "Delhi", rent: 53000, img: "concert21.jpg" },
+    { name: "Hardcore Metal Fest", city: "Stockholm", rent: 58000, img: "concert22.jpg" },
+    { name: "Electro House Party", city: "Miami", rent: 62000, img: "concert23.jpg" }
+];
+
+        function displayConcerts(filteredConcerts = concerts) {
+            const concertList = document.getElementById("concertList");
+            concertList.innerHTML = "";
+            filteredConcerts.forEach((concert) => {
+                const concertDiv = document.createElement("div");
+                concertDiv.classList.add("concert");
+                concertDiv.innerHTML = `<img src="${concert.img}" alt="${concert.name}"><h3>${concert.name}</h3><p>${concert.city}</p><p>Rent: ₹${concert.rent}</p>`;
+                concertDiv.onclick = () => openConcertBookingModal(concert.name);
+                concertList.appendChild(concertDiv);
+            });
+        }
+
+        function searchConcerts() {
+            const query = document.querySelector(".search-bar").value.toLowerCase();
+            const filteredConcerts = concerts.filter(concert => concert.city.toLowerCase().includes(query) || concert.name.toLowerCase().includes(query));
+            displayConcerts(filteredConcerts);
+        }
+
+        function openConcertBookingModal(concertName) {
+            document.getElementById("concertModalTitle").innerText = `Book ${concertName}`;
+            document.getElementById("concertBookingModal").classList.add("active");
+        }
+
+        function closeConcertModal() {
+            document.getElementById("concertBookingModal").classList.remove("active");
+        }
+
+        function confirmConcertBooking() {
+            const attendees = document.getElementById("concertAttendees").value;
+            const bookingDate = document.getElementById("concertBookingDate").value;
+            const timeFromHour = document.getElementById("concertTimeFromHour").value;
+            const timeFromMinute = document.getElementById("concertTimeFromMinute").value;
+            const timeFromPeriod = document.getElementById("concertTimeFromPeriod").value;
+            const timeToHour = document.getElementById("concertTimeToHour").value;
+            const timeToMinute = document.getElementById("concertTimeToMinute").value;
+            const timeToPeriod = document.getElementById("concertTimeToPeriod").value;
+            const seating = document.getElementById("concertSeating").value;
+            const specialRequest = document.getElementById("concertSpecialRequest").value;
+
+            if (attendees && bookingDate && timeFromHour && timeFromMinute && timeFromPeriod && timeToHour && timeToMinute && timeToPeriod && seating) {
+                const bookingDetails = {
+                    concert: document.getElementById("concertModalTitle").innerText.replace("Book ", ""),
+                    attendees,
+                    bookingDate,
+                    timeFrom: `${timeFromHour}:${timeFromMinute} ${timeFromPeriod}`,
+                    timeTo: `${timeToHour}:${timeToMinute} ${timeToPeriod}`,
+                    seating,
+                    specialRequest
+                };
+
+                let bookings = JSON.parse(localStorage.getItem("concertBookings")) || [];
+                bookings.push(bookingDetails);
+                localStorage.setItem("concertBookings", JSON.stringify(bookings));
+                alert("Booking Confirmed!");
+                closeConcertModal();
+            } else {
+                alert("Please fill all details");
+            }
+        }
+
+        displayConcerts();
+    </script>
+</body>
+</html>

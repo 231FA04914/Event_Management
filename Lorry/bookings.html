@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bookings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #007bff;
+            padding: 15px 30px;
+            color: white;
+        }
+
+        .navbar h2 {
+            margin: 0;
+        }
+        
+        .back-btn {
+            background: white;
+            color: #007bff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #0056b3;
+            color: white;
+        }
+
+        .booking-header {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .booking-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        
+        .booking-card {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            width: 300px;
+            text-align: left;
+            position: relative;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+        }
+
+        .booking-card h3 {
+            margin-top: 0;
+        }
+
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        .delete-btn:hover {
+            background: darkred;
+        }
+
+        .no-bookings {
+            font-size: 18px;
+            color: #666;
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .icon {
+            color: #007bff;
+            margin-right: 8px;
+        }
+
+        @media(max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>Your Bookings</h2>
+        <button class="back-btn" onclick="window.location.href='home.html'"><i class="fas fa-home"></i> Back to Home</button>
+    </div>
+
+    <div class="booking-header" id="bookingCount"></div>
+    <div class="booking-list" id="bookingList"></div>
+    
+    <script>
+        function displayBookings() {
+            const bookingList = document.getElementById("bookingList");
+            const bookingCount = document.getElementById("bookingCount");
+            const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            
+            bookingList.innerHTML = "";
+            
+            if (bookings.length === 0) {
+                bookingCount.innerHTML = "";
+                bookingList.innerHTML = "<p class='no-bookings'>No bookings available.</p>";
+                return;
+            }
+
+            bookingCount.innerHTML = `You have <strong>${bookings.length}</strong> active booking(s):`;
+            
+            bookings.forEach((booking, index) => {
+                const bookingDiv = document.createElement("div");
+                bookingDiv.classList.add("booking-card");
+                bookingDiv.innerHTML = `
+                    <h3><i class="fas fa-calendar icon"></i>${booking.festival}</h3>
+                    <p><i class="fas fa-users icon"></i><strong>Visitors:</strong> ${booking.visitors}</p>
+                    <p><i class="fas fa-calendar-day icon"></i><strong>Date:</strong> ${booking.bookingDate}</p>
+                    <p><i class="fas fa-clock icon"></i><strong>Time:</strong> ${booking.timeFrom} - ${booking.timeTo}</p>
+                    <p><i class="fas fa-utensils icon"></i><strong>Food Type:</strong> ${booking.foodType}</p>
+                    <p><i class="fas fa-lightbulb icon"></i><strong>Suggestion:</strong> ${booking.foodSuggestion || "None"}</p>
+                    <button class="delete-btn" onclick="confirmDeleteBooking(${index})"><i class="fas fa-trash"></i> Cancel Booking</button>
+                `;
+                bookingList.appendChild(bookingDiv);
+            });
+        }
+        function displayBookings() {
+            const bookingList = document.getElementById('bookingList');
+            const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+            if (bookings.length === 0) {
+                bookingList.innerHTML = "<p>No bookings found.</p>";
+                return;
+            }
+
+            bookings.forEach((booking) => {
+                const bookingDiv = document.createElement("div");
+                bookingDiv.classList.add("booking");
+                bookingDiv.innerHTML = `
+                    <h4>${booking.hall}</h4>
+                    <p>Visitors: ${booking.visitors}</p>
+                    <p>Date: ${booking.bookingDate}</p>
+                    <p>Time: ${booking.timeFrom} to ${booking.timeTo}</p>
+                    <p>Food Type: ${booking.foodType}</p>
+                    <p>Food Suggestion: ${booking.foodSuggestion || 'None'}</p>
+                `;
+                bookingList.appendChild(bookingDiv);
+            });
+        }
+
+        displayBookings();
+        
+        function confirmDeleteBooking(index) {
+            const confirmation = confirm("Are you sure you want to cancel this booking?");
+            if (confirmation) {
+                deleteBooking(index);
+            }
+        }
+
+        function deleteBooking(index) {
+            let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            bookings.splice(index, 1);
+            localStorage.setItem("bookings", JSON.stringify(bookings));
+            displayBookings();
+        }
+        
+        displayBookings();
+    </script>
+</body>
+</html>

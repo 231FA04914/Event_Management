@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 1;
+  }
+
+  header {
+    background-color: white;
+    color: black;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    padding: 0.5rem;
+    z-index: 100;
+    border-bottom: 1px solid #ddd; /* Add a border to separate header and content */
+  }
+
+  body {
+    background-image: url("imgback2.jpg");
+    background-size: cover;
+    margin: 0;
+    padding-top: 4rem;
+    background-color: #D8D8D8;
+    font-family: sans-serif;
+  }
+
+  nav li {
+    margin-right: 50px;
+  }
+
+  nav a {
+    color: black;
+  }
+
+  nav a:hover {
+    background-color: #555;
+  }
+
+.feedback-form {
+    max-width: 600px;
+    margin: 100px auto;
+    background-color: transparent; /* Set background color to transparent */
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+.feedback-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.feedback-form input[type="text"],
+.feedback-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.feedback-form button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    padding: 1rem 0;
+}
+</style>
+</head>
+<body>
+<header>
+    <h1 style="font-family: 'Arial', sans-serif; font-size: 32px;">EVENT MANAGEMENT</h1>
+    <nav>
+        <ul>
+            <li><a href="home.html" onclick="scrollToSection('homeSection')">Home</a></li>
+            <li><a href="event.html" onclick="scrollToSection('eventsSection')">Events</a></li>
+            <li><a href="feedback.html" onclick="scrollToSection('feedbackSection')">Feedback</a></li>
+            <li><a href="Contact.html" onclick="scrollToSection('aboutUsSection')">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="feedback-form">
+    <form action="submit_feedback.php" method="post">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" required>
+       
+        <label for="email">Your Email:</label>
+        <input type="text" id="email" name="email" required>
+       
+        <label for="feedback">Feedback:</label>
+        <textarea id="feedback" name="feedback" rows="4" required></textarea>
+       
+        <button type="submit">Submit Feedback</button>
+    </form>
+</div>
+</body>
+</html>

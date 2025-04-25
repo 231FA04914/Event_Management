@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Hall Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ff6600;
+            padding: 15px;
+            color: white;
+        }
+
+        .search-bar {
+            padding: 8px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .hall-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .hall {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: 0.3s;
+            width: 250px;
+            text-align: center;
+        }
+
+        .hall img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .hall:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 320px;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 15px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .modal-content button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <input type="text" class="search-bar" placeholder="Search city..." onkeyup="searchHalls()">
+        <div>
+            <button onclick="window.location.href='home.html'">Back to Home</button>
+            <button onclick="window.location.href='bookings.html'">Your Bookings</button>
+        </div>
+    </div>
+
+    <div class="hall-list" id="hall"></div>
+
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Book Hall</h3>
+            <label>No. of Visitors:</label>
+            <input type="number" id="visitors" min="1" required>
+            <label>Date:</label>
+            <input type="date" id="bookingDate" required>
+            <label>Time From:</label>
+            <select id="timeFromHour"></select>
+            <select id="timeFromMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeFromPeriod">
+                <option>AM</option>
+                <option>PM</option>
+            </select>
+            <label>Time To:</label>
+            <select id="timeToHour"></select>
+            <select id="timeToMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeToPeriod">
+                <option>AM</option>
+                <option>PM</option>
+            </select>
+            <label>Type of Food:</label>
+            <select id="foodType">
+                <option>Veg</option>
+                <option>Non-Veg</option>
+                <option>Mixed</option>
+            </select>
+            <label>Suggest a Food Item:</label>
+            <input type="text" id="foodSuggestion">
+            <button onclick="confirmBooking()">Confirm</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const halls = [
+            { name: "Grand Palace", city: "Hyderabad", rent : 50000, img: "hall1.jpg" },
+            { name: "Royal Banquet", city: "Delhi", rent: 75000, img: "hall2.jpg" },
+            { name: "The Imperial Hall", city: "Mumbai", rent: 60000, img: "hall3.jpg" },
+            { name: "Golden Orchid", city: "Chennai", rent: 55000, img: "hall4.jpg" },
+            { name: "Silver Heights", city: "Bangalore", rent: 58000, img: "hall5.jpg" },
+            { name: "Lavish Lounge", city: "Kolkata", rent: 65000, img: "hall6.jpg" },
+            { name: "Majestic Hall", city: "Pune", rent: 70000, img: "hall7.jpg" },
+            { name: "Crystal Palace", city: "Ahmedabad", rent: 72000, img: "hall8.jpg" },
+            { name: "Elegant Events", city: "Jaipur", rent: 48000, img: "hall9.jpg" },
+            { name: "Starlight Venue", city: "Lucknow", rent: 53000, img: "hall10.jpg" },
+            { name: "Opulent Oasis", city: "Surat", rent: 59000, img: "hall11.jpg" },
+            { name: "Regal Retreat", city: "Nagpur", rent: 51000, img: "hall12.jpg" },
+            { name: "Charming Celebrations", city: "Visakhapatnam", rent: 54000, img: "hall13.jpg" },
+            { name: "Noble Nook", city: "Indore", rent: 62000, img: "hall14.jpg" },
+            { name: "Glamour Hall", city: "Coimbatore", rent: 57000, img: "hall15.jpg" },
+            { name: "Serene Space", city: "Vadodara", rent: 49000, img: "hall16.jpg" },
+            { name: "Tranquil Terrace", city: "Bhopal", rent: 53000, img: "hall17.jpg" },
+            { name: "Lavender Lounge", city: "Mysore", rent: 60000, img: "hall18.jpg" },
+            { name: "Harmony Hall", city: "Nashik", rent: 55000, img: "hall19.jpg" },
+            { name: "Elysium Events", city: "Ranchi", rent: 48000, img: "hall20.jpg" },
+            { name: "Blissful Banquet", city: "Dehradun", rent: 52000, img: "hall21.jpg" },
+            { name: "Radiant Room", city: "Agra", rent: 58000, img: "hall22.jpg" },
+            { name: "Chic Chamber", city: "Gurgaon", rent: 75000, img: "hall23.jpg" },
+            { name: "Vibrant Venue", city: "Noida", rent: 64000, img: "hall24.jpg" },
+            { name: "Sapphire Suite", city: "Faridabad", rent: 59000, img: "hall25.jpg" },
+            { name: "Crown Hall", city: "Thane", rent: 71000, img: "hall26.jpg" }
+        ];
+
+        let selectedHall = null;
+
+        function displayHalls() {
+            const hallList = document.getElementById("hall");
+            hallList.innerHTML = "";
+            halls.forEach((hall, index) => {
+                hallList.innerHTML += `
+                    <div class="hall" onclick="openModal(${index})">
+                        <img src="${hall.img}" alt="${hall.name}">
+                        <h3>${hall.name}</h3>
+                        <p>City: ${hall.city}</p>
+                        <p>Rent: ₹${hall.rent}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function openModal(index) {
+            selectedHall = halls[index];
+            document.getElementById("modalTitle").innerText = `Book: ${selectedHall.name}`;
+            document.getElementById("bookingModal").classList.add("active");
+        }
+
+                function closeModal() {
+            document.getElementById("bookingModal").classList.remove("active");
+            clearForm();
+        }
+
+        function clearForm() {
+            document.getElementById("visitors").value = "";
+            document.getElementById("bookingDate").value = "";
+            document.getElementById("timeFromHour").value = "";
+            document.getElementById("timeToHour").value = "";
+            document.getElementById("timeFromMinute").value = "00";
+            document.getElementById("timeToMinute").value = "00";
+            document.getElementById("timeFromPeriod").value = "AM";
+            document.getElementById("timeToPeriod").value = "AM";
+            document.getElementById("foodType").value = "Veg";
+            document.getElementById("foodSuggestion").value = "";
+        }
+
+        function confirmBooking() {
+            const visitors = document.getElementById("visitors").value;
+            const date = document.getElementById("bookingDate").value;
+            const timeFrom = `${document.getElementById("timeFromHour").value}:${document.getElementById("timeFromMinute").value} ${document.getElementById("timeFromPeriod").value}`;
+            const timeTo = `${document.getElementById("timeToHour").value}:${document.getElementById("timeToMinute").value} ${document.getElementById("timeToPeriod").value}`;
+            const foodType = document.getElementById("foodType").value;
+            const foodSuggestion = document.getElementById("foodSuggestion").value;
+
+            if (!visitors || !date || !selectedHall) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            alert(`Booking Confirmed for ${selectedHall.name}!\nDate: ${date}\nVisitors: ${visitors}\nTime: ${timeFrom} to ${timeTo}\nFood: ${foodType} (${foodSuggestion})`);
+            closeModal();
+        }
+
+        function populateTimeOptions() {
+            const timeFromHour = document.getElementById("timeFromHour");
+            const timeToHour = document.getElementById("timeToHour");
+
+            for (let i = 1; i <= 12; i++) {
+                timeFromHour.innerHTML += `<option value="${i < 10 ? '0' + i : i}">${i}</option>`;
+                timeToHour.innerHTML += `<option value="${i < 10 ? '0' + i : i}">${i}</option>`;
+            }
+        }
+
+        function searchHalls() {
+            const query = document.querySelector(".search-bar").value.toLowerCase();
+            const hallList = document.getElementById("hall");
+            hallList.innerHTML = "";
+            halls.filter(hall => hall.city.toLowerCase().includes(query)).forEach((hall, index) => {
+                hallList.innerHTML += `
+                    <div class="hall" onclick="openModal(${index})">
+                        <img src="${hall.img}" alt="${hall.name}">
+                        <h3>${hall.name}</h3>
+                        <p>City: ${hall.city}</p>
+                        <p>Rent: ₹${hall.rent}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize the page
+        window.onload = () => {
+            displayHalls();
+            populateTimeOptions();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Booking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ff6600;
+            padding: 15px;
+            color: white;
+        }
+
+        .search-bar {
+            padding: 8px;
+            width: 250px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+
+        .festival-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .festival {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: 0.3s;
+            width: 250px;
+            text-align: center;
+            position: relative;
+        }
+
+        .festival img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .festival:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 15px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .modal-content button:hover {
+            background: #ff6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <input type="text" class="search-bar" placeholder="Search festival..." onkeyup="searchFestivals()">
+        <button onclick="window.location.href='home.html'">Back to Home</button>
+        <button onclick="window.location.href='bookings.html'">Your Bookings</button>
+    </div>
+
+    <div class="festival-list" id="festivalList"></div>
+    
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Book Festival</h3>
+            <label>No. of Visitors:</label>
+            <input type="number" id="visitors" min="1"><br>
+            <label>Date:</label>
+            <input type="date" id="bookingDate"><br>
+            <label>Time From:</label>
+            <select id="timeFromHour">
+                <option value ="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="timeFromMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeFromPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Time To:</label>
+            <select id="timeToHour">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+            <select id="timeToMinute">
+                <option value="00">00</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="45">45</option>
+            </select>
+            <select id="timeToPeriod">
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+            </select><br>
+            <label>Type of Food:</label>
+            <select id="foodType">
+                <option>Veg</option>
+                <option>Non-Veg</option>
+                <option>Mixed</option>
+            </select><br>
+            <label>Suggest a Food Item:</label>
+            <input type="text" id="foodSuggestion"><br>
+            <button onclick="confirmBooking()">Confirm Booking</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+    const festivals = [
+        { name: "Spring Festival", city: "Delhi", rent: 30000, img: "festival1.jpg" },
+        { name: "Summer Fest", city: "Mumbai", rent: 40000, img: "festival2.jpg" },
+        { name: "The Royal Courtyard", city: "Hyderabad", rent: 65000, img: "festival3.jpg" },
+        { name: "Emerald Banquet", city: "Chennai", rent: 55000, img: "festival4.jpg" },
+        { name: "Golden Bliss Hall", city: "Bangalore", rent: 70000, img: "festival5.jpg" },
+        { name: "The Majestic Venue", city: "Kolkata", rent: 50000, img: "festival6.jpg" },
+        { name: "Pearl Grand", city: "Pune", rent: 48000, img: "festival7.jpg" },
+        { name: "Silver Ferns Banquet", city: "Jaipur", rent: 53000, img: "festival8.jpg" },
+        { name: "Royal Orchid Palace", city: "Lucknow", rent: 59000, img: "festival9.jpg" },
+        { name: "Diamond Jubilee Hall", city: "Ahmedabad", rent: 62000, img: "festival10.jpg" },
+        { name: "The Imperial Club", city: "Chandigarh", rent: 47000, img: "festival11.jpg" },
+        { name: "Sunset Lawn", city: "Goa", rent: 68000, img: "festival12.jpg" },
+        { name: "Moonlight Banquet", city: "Surat", rent: 45000, img: "festival13.jpg" },
+        { name: "The Grand Pavilion", city: "Nagpur", rent: 52000, img: "festival14.jpg" },
+        { name: "Starry Night Hall", city: "Bhopal", rent: 49000, img: "festival15.jpg" },
+        { name: "Platinum Paradise", city: "Visakhapatnam", rent: 58000, img: "festival16.jpg" },
+        { name: "Heritage Royal Hall", city: "Coimbatore", rent: 60000, img: "festival17.jpg" },
+        { name: "Sapphire Banquet", city: "Indore", rent: 54000, img: "festival18.jpg" },
+        { name: "Celestial Heights", city: "Thiruvananthapuram", rent: 51000, img: "festival19.jpg" },
+        { name: "Opulent Palace", city: "Vadodara", rent: 49000, img: "festival20.jpg" },
+        { name: "Lotus Grand Hall", city: "Ludhiana", rent: 56000, img: "festival21.jpg" },
+        { name: "The Serene Retreat", city: "Patna", rent: 47000, img: "festival22.jpg" },
+        { name: "Majestic Heights", city: "Mysore", rent: 53000, img: "festival23.jpg" },
+        { name: "The Starlit Dome", city: "Ranchi", rent: 45000, img: "festival24.jpg" }
+    ];
+
+    function displayFestivals(filteredFestivals = festivals) {
+        const festivalList = document.getElementById("festivalList");
+        festivalList.innerHTML = "";
+        filteredFestivals.forEach((festival) => {
+            const festivalDiv = document.createElement("div");
+            festivalDiv.classList.add("festival");
+            festivalDiv.innerHTML = `<img src="${festival.img}" alt="${festival.name}"><h3>${festival.name}</h3><p>${festival.city}</p><p>Rent: ₹${festival.rent}</p>`;
+            festivalDiv.onclick = () => openBookingModal(festival.name);
+            festivalList.appendChild(festivalDiv);
+        });
+    }
+
+    function openBookingModal(festivalName) {
+        document.getElementById("modalTitle").innerText = `Book ${festivalName}`;
+        document.getElementById("bookingModal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("bookingModal").classList.remove("active");
+    }
+
+    function confirmBooking() {
+        const visitors = document.getElementById("visitors").value;
+        const bookingDate = document.getElementById("bookingDate").value;
+        const timeFromHour = document.getElementById("timeFromHour").value;
+        const timeFromMinute = document.getElementById("timeFromMinute").value;
+        const timeFromPeriod = document.getElementById("timeFromPeriod").value;
+        const timeToHour = document.getElementById("timeToHour").value;
+        const timeToMinute = document.getElementById("timeToMinute").value;
+        const timeToPeriod = document.getElementById("timeToPeriod").value;
+        const foodType = document.getElementById("foodType").value;
+        const foodSuggestion = document.getElementById("foodSuggestion").value;
+
+        if (visitors && bookingDate && timeFromHour && timeFromMinute && timeFromPeriod && timeToHour && timeToMinute && timeToPeriod && foodType) {
+            const bookingDetails = {
+                festival: document.getElementById("modalTitle").innerText.replace("Book ", ""),
+                visitors,
+                bookingDate,
+                timeFrom: `${timeFromHour}:${timeFromMinute} ${timeFromPeriod}`,
+                timeTo: `${timeToHour}:${timeToMinute} ${timeToPeriod}`,
+                foodType,
+                foodSuggestion
+            };
+
+            let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+            bookings.push(bookingDetails);
+            localStorage.setItem("bookings", JSON.stringify(bookings));
+            alert("Booking Confirmed!");
+            closeModal();
+        } else {
+            alert("Please fill all details");
+        }
+    }
+
+    function searchFestivals() {
+        const query = document.querySelector(".search-bar").value.toLowerCase();
+        const filteredFestivals = festivals.filter(festival => festival.city.toLowerCase().includes(query) || festival.name.toLowerCase().includes(query));
+        displayFestivals(filteredFestivals);
+    }
+
+    displayFestivals();
+    </script>
+</body>
+</html>
